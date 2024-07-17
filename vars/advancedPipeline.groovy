@@ -12,17 +12,24 @@ def call(Map params) {
     config.stages.each { stageName, stageConfig ->
         stage(stageName) {
             stageConfig.each { stepName, stepConfig ->
-                if (stepConfig.command) {
-                    echo "Executing command: ${stepConfig.command}"
-                    sh stepConfig.command
-                } else if (stepConfig.groovyScript) {
-                    echo "Executing Groovy script for step: ${stepName}"
-                    script {
-                        evaluate(stepConfig.groovyScript)
+                try {
+                    if (stepConfig.command) {
+                        echo "Executing command: ${stepConfig.command}"
+                        sh stepConfig.command
+                    } else if (stepConfig.groovyScript) {
+                        echo "Executing Groovy script for step: ${stepName}"
+                        script {
+                            evaluate(stepConfig.groovyScript)
+                        }
                     }
-                }
-                if (stepConfig.failPipeline) {
-                    error("Step ${stepName} is configured to fail the pipeline")
+                    if (stepConfig.failPipeline) {
+                        error("Step ${stepName} is configured to fail the pipeline")
+                    }
+                } catch (Exception e) {
+                    echo "Step ${stepName} failed: ${e.message}"
+                    if (stepConfig.failPipeline) {
+                        error("Step ${stepName} failed and was configured to fail the pipeline")
+                    }
                 }
             }
         }
