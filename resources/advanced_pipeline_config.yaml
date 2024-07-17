@@ -2,7 +2,6 @@ stages:
   Build:
     compile:
       command: "echo 'Compiling the project'"
-      failPipeline: true
     staticAnalysis:
       command: "echo 'Running static analysis'"
   Test:
