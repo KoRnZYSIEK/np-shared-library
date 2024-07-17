@@ -57,9 +57,9 @@ def call(Map config) {
             stage('Build and Push Image') {
                 steps {
                     script {
-                        def dockerTag = "${env.BUILD_ID}.${env.GIT_COMMIT.take(7)}"
+                        dockerTag = "${env.BUILD_ID}.${env.GIT_COMMIT.take(7)}"
                         logger.debug("Docker tag: ${dockerTag}")
-                        def applicationImage = buildImage(config.imageName, dockerTag)
+                        applicationImage = buildImage(config.imageName, dockerTag)
                         pushToRegistry(applicationImage)
                         logger.info("Image built and pushed: ${config.imageName}:${dockerTag}")
                     }
