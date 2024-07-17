@@ -7,7 +7,7 @@ class PipelineConfig implements Serializable {
 
     PipelineConfig(Map params, def steps) {
         def yamlConfig = loadYamlConfig(steps)
-        this.config = mergeMaps(yamlConfig, params.appendStages ? params : overrideStages(params))
+        this.config = mergeConfigs(yamlConfig, params)
     }
 
     def getStages() {
@@ -15,11 +15,24 @@ class PipelineConfig implements Serializable {
     }
 
     @NonCPS
-    private Map overrideStages(Map params) {
-        def result = params.clone()
+    private Map mergeConfigs(Map yamlConfig, Map params) {
+        Map result = yamlConfig.clone()
+        
         if (params.containsKey('stages')) {
-            result.stages = params.stages
+            if (params.appendStages) {
+                result.stages = mergeMaps(result.stages ?: [:], params.stages ?: [:])
+            } else {
+                result.stages = params.stages
+            }
         }
+        
+        // Merge other parameters
+        params.each { key, value ->
+            if (key != 'stages' && key != 'appendStages') {
+                result[key] = value
+            }
+        }
+        
         return result
     }
 
@@ -31,20 +44,11 @@ class PipelineConfig implements Serializable {
     }
 
     @NonCPS
-    private Map mergeMaps(Map... maps) {
-        Map result = [:]
-        maps.each { map ->
-            result = mergeMapRecursive(result, map)
-        }
-        return result
-    }
-
-    @NonCPS
-    private Map mergeMapRecursive(Map base, Map override) {
+    private Map mergeMaps(Map base, Map override) {
         Map result = new HashMap(base)
         override.each { key, value ->
             if (base[key] instanceof Map && value instanceof Map) {
-                result[key] = mergeMapRecursive(base[key], value)
+                result[key] = mergeMaps(base[key], value)
             } else {
                 result[key] = value
             }
