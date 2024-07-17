@@ -1,10 +1,10 @@
 package org.nprog
 
-import com.lesfurets.jenkins.unit.BasePipelineTest
+import com.lesfurets.jenkins.unit.declarative.*
 import org.junit.Before
 import org.junit.Test
 
-class AdvancedPipelineTest extends BasePipelineTest {
+class AdvancedPipelineTest extends DeclarativePipelineTest {
 
     @Override
     @Before
@@ -71,6 +71,7 @@ stages:
         script.call(params)
 
         // Validate the outputs, errors, and debug messages if necessary
+        printCallStack()
         assertJobStatusSuccess()
     }
 }

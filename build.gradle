@@ -8,34 +8,31 @@ repositories {
 }
 
 dependencies {
-    implementation('org.codehaus.groovy:groovy-all:2.4.21')
-    
-
-    implementation('commons-io:commons-io:2.16.1')
-    implementation('org.apache.ivy:ivy:2.5.2')
-    
-    implementation('org.apache.commons:commons-lang3:3.14.0')
-    
-    compile 'com.cloudbees:groovy-cps:1.22'
+    implementation 'org.codehaus.groovy:groovy-all:2.4.21'
+    implementation 'commons-io:commons-io:2.16.1'
+    implementation 'org.apache.ivy:ivy:2.5.2'
+    implementation 'org.apache.commons:commons-lang3:3.14.0'
+    implementation 'com.cloudbees:groovy-cps:1.22'
     implementation 'org.yaml:snakeyaml:1.30'
     testImplementation 'junit:junit:4.13.2' // JUnit 4
-    
+    testImplementation 'com.lesfurets:jenkins-pipeline-unit:1.10'
 }
 
 sourceSets {
     main {
         groovy {
-            srcDirs = ['src/org/nprog']
+            srcDirs = ['src/main/groovy']
         }
     }
     test {
         groovy {
-            srcDirs = ['src/org/nprog']
+            srcDirs = ['src/test/groovy']
         }
     }
 }
 
 test {
+    useJUnit() // Ensure we are using JUnit
     testLogging {
         events "passed", "skipped", "failed"
     }
