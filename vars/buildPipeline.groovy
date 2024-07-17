@@ -1,6 +1,8 @@
-import org.nprog.Logger
+import org.example.Logger
 
 def call(Map config) {
+    def logger = new Logger()
+    
     pipeline {
         agent { label 'agent' }
         environment {
@@ -15,8 +17,8 @@ def call(Map config) {
                 steps {
                     script {
                         if (params.DEBUG_MODE) {
-                            Logger.enableDebug()
-                            Logger.debug("Debug mode enabled")
+                            logger.enableDebug()
+                            logger.debug("Debug mode enabled")
                         }
                     }
                 }
@@ -24,8 +26,8 @@ def call(Map config) {
             stage('Get Code') {
                 steps {
                     checkout scm
-                    Logger.info("Code checkout completed")
-                    Logger.debug("Checked out branch: ${env.GIT_BRANCH}")
+                    logger.info("Code checkout completed")
+                    logger.debug("Checked out branch: ${env.GIT_BRANCH}")
                 }
             }
             stage('Tests and Analysis') {
@@ -33,15 +35,15 @@ def call(Map config) {
                     stage('Unit tests') {
                         steps {
                             runTests()
-                            Logger.info("Unit tests completed")
-                            Logger.debug("Test results saved to test-results/pytest-report.xml")
+                            logger.info("Unit tests completed")
+                            logger.debug("Test results saved to test-results/pytest-report.xml")
                         }
                     }
                     stage('Sonarqube analysis') {
                         steps {
                             runSonarAnalysis(env.scannerHome)
-                            Logger.info("Sonarqube analysis completed")
-                            Logger.debug("Sonarqube scanner home: ${env.scannerHome}")
+                            logger.info("Sonarqube analysis completed")
+                            logger.debug("Sonarqube scanner home: ${env.scannerHome}")
                         }
                     }
                 }
@@ -50,10 +52,10 @@ def call(Map config) {
                 steps {
                     script {
                         def dockerTag = "${env.BUILD_ID}.${env.GIT_COMMIT.take(7)}"
-                        Logger.debug("Docker tag: ${dockerTag}")
+                        logger.debug("Docker tag: ${dockerTag}")
                         def applicationImage = buildImage(config.imageName, dockerTag)
                         pushToRegistry(applicationImage)
-                        Logger.info("Image built and pushed: ${config.imageName}:${dockerTag}")
+                        logger.info("Image built and pushed: ${config.imageName}:${dockerTag}")
                     }
                 }
             }
@@ -65,10 +67,10 @@ def call(Map config) {
                           string(name: 'frontendDockerTag', value: dockerTag)
                       ],
                       wait: false
-                Logger.info("Pipeline completed successfully")
+                logger.info("Pipeline completed successfully")
             }
             failure {
-                Logger.error("Pipeline failed")
+                logger.error("Pipeline failed")
             }
             always {
                 junit testResults: "test-results/*.xml"
