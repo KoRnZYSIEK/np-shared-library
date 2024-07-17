@@ -6,7 +6,8 @@ class PipelineConfig {
     Map config
 
     PipelineConfig(Map params) {
-        def yamlConfig = new Yaml().load(libraryResource 'advanced_pipeline_config.yaml')
+        def configText = libraryResource 'advanced_pipeline_config.yaml'
+        def yamlConfig = new Yaml().load(configText)
         this.config = yamlConfig + params
     }
 
