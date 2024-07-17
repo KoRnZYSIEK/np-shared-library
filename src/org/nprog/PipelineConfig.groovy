@@ -1,13 +1,10 @@
 package org.nprog
 
-import org.yaml.snakeyaml.Yaml
-
 class PipelineConfig {
     Map config
 
-    PipelineConfig(Map params) {
-        def configText = libraryResource 'advanced_pipeline_config.yaml'
-        def yamlConfig = new Yaml().load(configText)
+    PipelineConfig(Map params, def steps) {
+        def yamlConfig = loadYamlConfig(steps)
         this.config = yamlConfig + params
     }
 
@@ -17,5 +14,11 @@ class PipelineConfig {
 
     String toString() {
         return config.toString()
+    }
+
+    private loadYamlConfig(steps) {
+        def yaml = new org.yaml.snakeyaml.Yaml()
+        def configText = steps.libraryResource('advanced_pipeline_config.yaml')
+        return yaml.load(configText)
     }
 }
