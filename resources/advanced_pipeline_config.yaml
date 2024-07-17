@@ -1,0 +1,19 @@
+stages:
+  Build:
+    compile:
+      command: "echo 'Compiling the project'"
+      failPipeline: true
+    staticAnalysis:
+      command: "echo 'Running static analysis'"
+  Test:
+    unitTests:
+      command: "echo 'Running unit tests'"
+    integrationTests:
+      command: "echo 'Running integration tests'"
+  Deploy:
+    deployToStaging:
+      groovyScript: |
+        def version = "1.0.0" // Simulating version retrieval
+        echo "Deploying version ${version} to staging"
+    smokeTest:
+      command: "echo 'Running smoke tests on staging environment'"
