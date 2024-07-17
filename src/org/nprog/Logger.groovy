@@ -7,18 +7,23 @@ class Logger {
     static final String ANSI_BLUE = "\u001B[34m"
     
     boolean debugMode = false
+    def steps
+
+    Logger(steps) {
+        this.steps = steps
+    }
 
     void info(String message) {
-        println("${ANSI_GREEN}INFO: ${message}${ANSI_RESET}")
+        steps.echo "${ANSI_GREEN}INFO: ${message}${ANSI_RESET}"
     }
 
     void error(String message) {
-        println("${ANSI_RED}ERROR: ${message}${ANSI_RESET}")
+        steps.echo "${ANSI_RED}ERROR: ${message}${ANSI_RESET}"
     }
 
     void debug(String message) {
         if (debugMode) {
-            println("${ANSI_BLUE}DEBUG: ${message}${ANSI_RESET}")
+            steps.echo "${ANSI_BLUE}DEBUG: ${message}${ANSI_RESET}"
         }
     }
 

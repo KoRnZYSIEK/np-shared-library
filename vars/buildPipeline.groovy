@@ -1,7 +1,7 @@
 import org.nprog.Logger
 
 def call(Map config) {
-    def logger = new Logger()
+    def logger = new Logger(this)
 
     pipeline {
         agent { label 'agent' }
