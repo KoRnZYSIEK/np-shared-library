@@ -1,8 +1,8 @@
-import org.example.Logger
+import org.nprog.Logger
 
 def call(Map config) {
     def logger = new Logger()
-    
+
     pipeline {
         agent { label 'agent' }
         environment {
