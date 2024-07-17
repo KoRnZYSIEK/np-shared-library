@@ -1,0 +1,46 @@
+plugins {
+    id 'groovy'
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation('org.codehaus.groovy:groovy-all:2.4.21')
+    
+
+    implementation('commons-io:commons-io:2.16.1')
+    implementation('org.apache.ivy:ivy:2.5.2')
+    
+    implementation('org.apache.commons:commons-lang3:3.14.0')
+    
+    compile 'com.cloudbees:groovy-cps:1.22'
+    implementation 'org.yaml:snakeyaml:1.30'
+    testImplementation 'junit:junit:4.13.2' // JUnit 4
+    
+}
+
+sourceSets {
+    main {
+        groovy {
+            srcDirs = ['src/org/nprog']
+        }
+    }
+    test {
+        groovy {
+            srcDirs = ['src/org/nprog']
+        }
+    }
+}
+
+test {
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+    reports {
+        junitXml.enabled = true
+        html.enabled = true
+    }
+}

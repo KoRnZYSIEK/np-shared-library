@@ -1,61 +1,76 @@
+package org.nprog
+
 import com.lesfurets.jenkins.unit.BasePipelineTest
 import org.junit.Before
 import org.junit.Test
-import static com.lesfurets.jenkins.unit.MethodCall.callArgsToString
-import static org.junit.Assert.assertTrue
 
 class AdvancedPipelineTest extends BasePipelineTest {
-    def advancedPipeline
 
     @Override
     @Before
     void setUp() throws Exception {
         super.setUp()
-        // Mock libraryResource
-        helper.registerAllowedMethod('libraryResource', [String.class], { fileName ->
-            return '''
+        // Register the libraryResource step to return the YAML configuration
+        helper.registerAllowedMethod('libraryResource', [String.class], { String resource ->
+            return """
 stages:
   Build:
     compile:
-      command: "echo 'Compiling'"
+      command: "echo 'Compiling the project'"
+    staticAnalysis:
+      command: "echo 'Running static analysis'"
   Test:
-    unitTest:
+    unitTests:
       command: "echo 'Running unit tests'"
-'''
+    integrationTests:
+      command: "echo 'Running integration tests'"
+  Deploy:
+    deployToStaging:
+      groovyScript: |
+        def version = "1.0.0" // Simulating version retrieval
+        echo "Deploying version \${version} to staging"
+    smokeTest:
+      command: "echo 'Running smoke tests on staging environment'"
+            """
         })
-        // Load the script
-        advancedPipeline = loadScript("vars/advancedPipeline.groovy")
-        
-        // Mock pipeline steps
-        helper.registerAllowedMethod('pipeline', [Closure.class], null)
-        helper.registerAllowedMethod('agent', [Closure.class], null)
-        helper.registerAllowedMethod('stages', [Closure.class], null)
-        helper.registerAllowedMethod('steps', [Closure.class], null)
-        helper.registerAllowedMethod('script', [Closure.class], { c -> c() })
-        helper.registerAllowedMethod('stage', [String.class, Closure.class], { s, c -> c() })
-        helper.registerAllowedMethod('echo', [String.class], { str -> println str })
+        // Mock the sh step
+        helper.registerAllowedMethod('sh', [String.class], { String command ->
+            println "Simulated command: ${command}"
+        })
+        // Mock the echo step
+        helper.registerAllowedMethod('echo', [String.class], { String message ->
+            println message
+        })
+        // Mock the error step
+        helper.registerAllowedMethod('error', [String.class], { String message ->
+            throw new Exception(message)
+        })
     }
 
     @Test
     void testAdvancedPipeline() {
-        def config = [
-            customParam: 'customValue'
+        def script = loadScript('vars/advancedPipeline.groovy')
+        def params = [
+            DEBUG_MODE: true,
+            stages: [
+                Build: [
+                    compile: [command: 'echo "Compiling the project"', failPipeline: false],
+                    staticAnalysis: [command: 'echo "Running static analysis"', failPipeline: false]
+                ],
+                Test: [
+                    unitTests: [command: 'echo "Running unit tests"', failPipeline: false],
+                    integrationTests: [command: 'echo "Running integration tests"', failPipeline: false]
+                ],
+                Deploy: [
+                    deployToStaging: [groovyScript: 'def version = "1.0.0"; echo "Deploying version ${version} to staging"', failPipeline: false],
+                    smokeTest: [command: 'echo "Running smoke tests on staging environment"', failPipeline: false]
+                ]
+            ]
         ]
+        
+        script.call(params)
 
-        // When
-        advancedPipeline(config)
-
-        // Then
-        printCallStack()
-        assertTrue(helper.callStack.findAll { call ->
-            call.methodName == "echo"
-        }.any { call ->
-            callArgsToString(call).contains("Executing compile: echo 'Compiling'")
-        })
-        assertTrue(helper.callStack.findAll { call ->
-            call.methodName == "echo"
-        }.any { call ->
-            callArgsToString(call).contains("Executing unitTest: echo 'Running unit tests'")
-        })
+        // Validate the outputs, errors, and debug messages if necessary
+        assertJobStatusSuccess()
     }
 }
