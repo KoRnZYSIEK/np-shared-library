@@ -1,4 +1,4 @@
-import org.example.Logger
+import org.nprog.Logger
 
 def call(Map config) {
     pipeline {
