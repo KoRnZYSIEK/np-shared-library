@@ -1,4 +1,4 @@
-package org.example
+package org.nprog
 
 class Logger {
     static final String ANSI_RESET = "\u001B[0m"
