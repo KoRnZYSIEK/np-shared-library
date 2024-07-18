@@ -2,15 +2,14 @@ import org.nprog.Logger
 
 def call(Map config) {
     def logger = new Logger(this)
-
     pipeline {
-        agent { label 'agent' }
+        agent { label PIPELINE_CONFIG.DEFAULT_AGENT }
         environment {
-            scannerHome = tool 'SonarQube'
+            scannerHome = tool PIPELINE_CONFIG.SONAR_TOOL
             PIP_BREAK_SYSTEM_PACKAGES = 1
         }
         parameters {
-            booleanParam(name: 'DEBUG_MODE', defaultValue: false, description: 'Enable debug logging')
+            booleanParam(name: 'DEBUG_MODE', defaultValue: PIPELINE_CONFIG.DEBUG_MODE_DEFAULT, description: 'Enable debug logging')
         }
         stages {
             stage('Initialize') {
@@ -57,7 +56,7 @@ def call(Map config) {
             stage('Build and Push Image') {
                 steps {
                     script {
-                        dockerTag = "${env.BUILD_ID}.${env.GIT_COMMIT.take(7)}"
+                        dockerTag = PIPELINE_CONFIG.DOCKER_TAG_FORMAT(env.BUILD_ID, env.GIT_COMMIT)
                         logger.debug("Docker tag: ${dockerTag}")
                         applicationImage = buildImage(config.imageName, dockerTag)
                         pushToRegistry(applicationImage)
@@ -68,7 +67,7 @@ def call(Map config) {
         }
         post {
             success {
-                build job: 'selenium',
+                build job: PIPELINE_CONFIG.SELENIUM_JOB,
                       parameters: [
                           string(name: 'frontendDockerTag', value: dockerTag)
                       ],
