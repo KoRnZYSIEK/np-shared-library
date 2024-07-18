@@ -1,1 +1,2 @@
-"This is a global constant"
+@groovy.transform.Field
+def globalVariable = "This is a global variable"
