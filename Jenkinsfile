@@ -13,7 +13,7 @@ pipeline {
             steps {
                 script {
                     // Run the tests using Gradle
-                    sh 'gradle test'
+                    sh 'gradle clean test'
                 }
             }
         }

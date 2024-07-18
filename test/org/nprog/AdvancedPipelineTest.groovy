@@ -1,15 +1,16 @@
 package org.nprog
 
-import com.lesfurets.jenkins.unit.declarative.*
+import com.lesfurets.jenkins.unit.BasePipelineTest
 import org.junit.Before
 import org.junit.Test
 
-class AdvancedPipelineTest extends DeclarativePipelineTest {
-
+class AdvancedPipelineTest extends BasePipelineTest {
+    
     @Override
     @Before
     void setUp() throws Exception {
         super.setUp()
+        
         // Register the libraryResource step to return the YAML configuration
         helper.registerAllowedMethod('libraryResource', [String.class], { String resource ->
             return """
@@ -33,18 +34,25 @@ stages:
       command: "echo 'Running smoke tests on staging environment'"
             """
         })
+        
         // Mock the sh step
         helper.registerAllowedMethod('sh', [String.class], { String command ->
             println "Simulated command: ${command}"
         })
+        
         // Mock the echo step
         helper.registerAllowedMethod('echo', [String.class], { String message ->
             println message
         })
+        
         // Mock the error step
         helper.registerAllowedMethod('error', [String.class], { String message ->
             throw new Exception(message)
         })
+
+        // Mock pipeline steps
+        helper.registerAllowedMethod('stage', [String.class, Closure.class], null)
+        helper.registerAllowedMethod('script', [Closure.class], null)
     }
 
     @Test
@@ -67,11 +75,13 @@ stages:
                 ]
             ]
         ]
-        
+       
         script.call(params)
-
+        
         // Validate the outputs, errors, and debug messages if necessary
         printCallStack()
+        
+        // Assert that all stages were executed
         assertJobStatusSuccess()
     }
 }

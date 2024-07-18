@@ -9,24 +9,21 @@ repositories {
 
 dependencies {
     implementation 'org.codehaus.groovy:groovy-all:2.4.21'
-    implementation 'commons-io:commons-io:2.16.1'
-    implementation 'org.apache.ivy:ivy:2.5.2'
-    implementation 'org.apache.commons:commons-lang3:3.14.0'
     implementation 'com.cloudbees:groovy-cps:1.22'
     implementation 'org.yaml:snakeyaml:1.30'
     testImplementation 'junit:junit:4.13.2' // JUnit 4
-    testImplementation 'com.lesfurets:jenkins-pipeline-unit:1.10'
+    testImplementation 'com.lesfurets:jenkins-pipeline-unit:1.1'
 }
 
 sourceSets {
     main {
         groovy {
-            srcDirs = ['src/main/groovy']
+            srcDirs = ['src/org/nprog']
         }
     }
     test {
         groovy {
-            srcDirs = ['src/test/groovy']
+            srcDirs = ['test/org/nprog']
         }
     }
 }
